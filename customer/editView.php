@@ -11,55 +11,52 @@ function validateForm()
         $errors['last_name'] = 'please enter the valid last name';
     }
 
-    if (empty($errors)) {
-        return true;
+    if (!empty($errors)) {
+        return $errors;
     }
-    return false;
+    return 1;
 }
 
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $validation = validateForm();
 
-    echo "<pre>";
-    print_r($validation);
-    die;
+    if ($validation == 1) {
+        if (!empty($_POST['customer_id'])) {
+            $statement = $db->prepare("UPDATE customers SET `first_name`=:fname, `last_name`=:lname,`username`=:username,`mobile`=:mobile,`email`=:email,`gender`=:gender,`hobbies`=:hobbies,`qualification`=:qualification,`updated_at`=:updated_at WHERE id=:custid");
+            $statement->execute([
+                'fname' => $_POST['first_name'] ?? '',
+                'lname' => $_POST['last_name'] ?? '',
+                'username' => $_POST['username'] ?? '',
+                'mobile' => $_POST['mobile'] ?? '',
+                'email' => $_POST['email'] ?? '',
+                'gender' => $_POST['gender'] ?? '',
+                'hobbies' => implode(',', $_POST['hobbies']) ?? '',
+                'qualification' => $_POST['qualification'] ?? '',
+                'updated_at' => date('Y-m-d H:i:s'),
+                'custid' => $_POST['customer_id'],
 
-
-    if (!empty($_POST['customer_id'])) {
-        $statement = $db->prepare("UPDATE customers SET `first_name`=:fname, `last_name`=:lname,`username`=:username,`mobile`=:mobile,`email`=:email,`gender`=:gender,`hobbies`=:hobbies,`qualification`=:qualification,`updated_at`=:updated_at WHERE id=:custid");
-        $statement->execute([
-            'fname' => $_POST['first_name'] ?? '',
-            'lname' => $_POST['last_name'] ?? '',
-            'username' => $_POST['username'] ?? '',
-            'mobile' => $_POST['mobile'] ?? '',
-            'email' => $_POST['email'] ?? '',
-            'gender' => $_POST['gender'] ?? '',
-            'hobbies' => implode(',', $_POST['hobbies']) ?? '',
-            'qualification' => $_POST['qualification'] ?? '',
-            'updated_at' => date('Y-m-d H:i:s'),
-            'custid' => $_POST['customer_id'],
-
-        ]);
-    } else {
-        $statement = $db->prepare('INSERT INTO customers (`first_name`, `last_name`,`username`,`mobile`,`email`,`gender`,`hobbies`,`qualification`,`created_at`,`updated_at`)
+            ]);
+        } else {
+            $statement = $db->prepare('INSERT INTO customers (`first_name`, `last_name`,`username`,`mobile`,`email`,`gender`,`hobbies`,`qualification`,`created_at`,`updated_at`)
         VALUES (:fname, :lname, :username, :mobile, :email, :gender, :hobbies, :qualification, :created_at, :updated_at)');
 
-        $statement->execute([
-            'fname' => $_POST['first_name'] ?? '',
-            'lname' => $_POST['last_name'] ?? '',
-            'username' => $_POST['username'] ?? '',
-            'mobile' => $_POST['mobile'] ?? '',
-            'email' => $_POST['email'] ?? '',
-            'gender' => $_POST['gender'] ?? '',
-            'hobbies' => implode(',', $_POST['hobbies']) ?? '',
-            'qualification' => $_POST['qualification'] ?? '',
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+            $statement->execute([
+                'fname' => $_POST['first_name'] ?? '',
+                'lname' => $_POST['last_name'] ?? '',
+                'username' => $_POST['username'] ?? '',
+                'mobile' => $_POST['mobile'] ?? '',
+                'email' => $_POST['email'] ?? '',
+                'gender' => $_POST['gender'] ?? '',
+                'hobbies' => implode(',', $_POST['hobbies']) ?? '',
+                'qualification' => $_POST['qualification'] ?? '',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
 
-        ]);
+            ]);
+        }
+        header("location:index.php");
     }
-    header("location:index.php");
 }
 if (!empty($_GET['uid'])) {
     $stmt = $db->prepare("SELECT * FROM customers WHERE id=:uid");
@@ -76,11 +73,13 @@ if (!empty($_GET['uid'])) {
     <form action="editView.php" method="post">
         <div class="form-group">
             <label for="first_name">First Name</label>
-            <input type="text" name="first_name" value="<?= $customer['first_name'] ?? '' ?>" id="first_name" class="form-control">
+            <input type="text" name="first_name" value="<?= $customer['first_name'] ?? $_POST['first_name'] ?? '' ?>" id="first_name" class="form-control">
+            <span class="text-danger"><?= $validation['first_name'] ?? '' ?></span>
         </div>
         <div class="form-group">
             <label for="last_name">Last Name</label>
-            <input type="text" name="last_name" value="<?= $customer['last_name'] ?? '' ?>" id="last_name" class="form-control">
+            <input type="text" name="last_name" value="<?= $customer['last_name'] ?? $_POST['last_name'] ?? '' ?>" id="last_name" class="form-control">
+            <span class="text-danger"><?= $validation['last_name'] ?? '' ?></span>
         </div>
         <div class="form-group">
             <label for="username">User Name</label>
