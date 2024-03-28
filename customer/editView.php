@@ -10,6 +10,15 @@ function validateForm()
     if (empty($_POST['last_name']) || strlen($_POST['last_name']) < 3) {
         $errors['last_name'] = 'please enter the valid last name';
     }
+    if (empty($_POST['username']) || strlen($_POST['username']) < 3) {
+        $errors['username'] = 'please enter the valid user name';
+    }
+    if (empty($_POST['mobile']) || strlen($_POST['mobile']) < 10) {
+        $errors['mobile'] = 'please enter the valid mobile number';
+    }
+    if (empty($_POST['email']) || strlen($_POST['email']) < 8) {
+        $errors['email'] = 'please enter the valid email id';
+    }
 
     if (!empty($errors)) {
         return $errors;
@@ -67,8 +76,9 @@ if (!empty($_GET['uid'])) {
 
 
 ?>
-
-<h1 class>CRUD USING PDO IN PHP</h1>
+<div class="text-align:center;">
+    <h1>CRUD USING PDO IN PHP</h1>
+</div>
 <div class="container">
     <form action="editView.php" method="post">
         <div class="form-group">
@@ -83,15 +93,19 @@ if (!empty($_GET['uid'])) {
         </div>
         <div class="form-group">
             <label for="username">User Name</label>
-            <input type="text" name="username" value="<?= $customer['username'] ?? '' ?>" id="username" class="form-control">
+            <input type="text" name="username" value="<?= $customer['username'] ?? $_POST['username'] ?? '' ?>" id="username" class="form-control">
+            <span class="text-danger"><?= $validation['username'] ?? '' ?></span>
         </div>
+        <!-- </div> -->
         <div class="form-group">
-            <label for="mobile">mobile</label>
-            <input type="text" name="mobile" value="<?= $customer['mobile'] ?? '' ?>" id="mobile" class="form-control">
+            <label for="mobile">Mobile</label>
+            <input type="text" name="mobile" value="<?= $customer['mobile'] ?? $_POST['mobile'] ?? '' ?>" id="mobile" class="form-control">
+            <span class="text-danger"><?= $validation['mobile'] ?? '' ?></span>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="text" name="email" value="<?= $customer['email'] ?? '' ?>" id="email" class="form-control">
+            <input type="text" name="email" value="<?= $customer['email'] ?? $_POST['email'] ?? '' ?>" id="email" class="form-control">
+            <span class="text-danger"><?= $validation['email'] ?? '' ?></span>
         </div>
 
         <!-- -------------code for gender---------- -->
